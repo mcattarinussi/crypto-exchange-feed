@@ -4,7 +4,27 @@ provider:
   name: aws
   runtime: nodejs8.10
   region: eu-west-1
+  stage: dev
+
+custom:
+  cryptocurrencyTableName: cryptocurrency-${self:provider.stage}
 
 functions:
   crypto-feed-scheduler:
     handler: functions/crypto-feed-scheduler.handler
+
+resources:
+  Resources:
+    CryptocurrencyTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.cryptocurrencyTableName}
+        AttributeDefinitions:
+          - AttributeName: symbol
+            AttributeType: S
+        KeySchema:
+          - AttributeName: symbol
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
