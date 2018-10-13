@@ -12,10 +12,7 @@ provider:
         - dynamodb:GetShardIterator
         - dynamodb:DescribeStream
         - dynamodb:ListStreams
-      Resource: { Fn::GetAtt: [ CryptocurrencyTable, Arn ] }
-
-custom:
-  cryptocurrencyTableName: cryptocurrency-${self:provider.stage}
+      Resource: { Fn::GetAtt: [ CryptocurrencyDynamoTable, Arn ] }
 
 functions:
   crypto-feed-scheduler:
@@ -23,15 +20,15 @@ functions:
     events:
       - stream:
           type: dynamodb
-          arn: { Fn::GetAtt: [ CryptocurrencyTable, StreamArn ] }
+          arn: { Fn::GetAtt: [ CryptocurrencyDynamoTable, StreamArn ] }
           batchSize: 1
 
 resources:
   Resources:
-    CryptocurrencyTable:
+    CryptocurrencyDynamoTable:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: ${self:custom.cryptocurrencyTableName}
+        TableName: ${self:service.name}-${self:provider.stage}-cryptocurrency
         AttributeDefinitions:
           - AttributeName: Symbol
             AttributeType: S
