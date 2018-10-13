@@ -1,0 +1,10 @@
+service: crypto-exchange-feed
+
+provider:
+  name: aws
+  runtime: nodejs8.10
+  region: eu-west-1
+
+functions:
+  crypto-feed-scheduler:
+    handler: functions/crypto-feed-scheduler.handler
