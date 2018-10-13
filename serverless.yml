@@ -5,6 +5,14 @@ provider:
   runtime: nodejs8.10
   region: eu-west-1
   stage: dev
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:GetRecords
+        - dynamodb:GetShardIterator
+        - dynamodb:DescribeStream
+        - dynamodb:ListStreams
+      Resource: { Fn::GetAtt: [ CryptocurrencyTable, Arn ] }
 
 custom:
   cryptocurrencyTableName: cryptocurrency-${self:provider.stage}
@@ -12,6 +20,11 @@ custom:
 functions:
   crypto-feed-scheduler:
     handler: functions/crypto-feed-scheduler.handler
+    events:
+      - stream:
+          type: dynamodb
+          arn: { Fn::GetAtt: [ CryptocurrencyTable, StreamArn ] }
+          batchSize: 1
 
 resources:
   Resources:
@@ -20,11 +33,13 @@ resources:
       Properties:
         TableName: ${self:custom.cryptocurrencyTableName}
         AttributeDefinitions:
-          - AttributeName: symbol
+          - AttributeName: Symbol
             AttributeType: S
         KeySchema:
-          - AttributeName: symbol
+          - AttributeName: Symbol
             KeyType: HASH
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
+        StreamSpecification:
+          StreamViewType: NEW_AND_OLD_IMAGES
