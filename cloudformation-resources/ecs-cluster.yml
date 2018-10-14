@@ -1,4 +1,8 @@
 Resources:
+  EcrRepository:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: ${self:custom.cryptofeed_docker_image}
   CryptoFeedsECSCluster:
     Type: AWS::ECS::Cluster
     Properties:
@@ -14,11 +18,13 @@ Resources:
       NetworkMode: awsvpc
       ContainerDefinitions:
         -
-          Command:
-            - sh
-            - -c
-            - 'while true; do echo "hey! I am the crypto-feed container for $CRYPTO_CURRENCY_SYMBOL"; sleep 5s; done'
-          Image: alpine:3.7
+          Image:
+            Fn::Join:
+              - '.'
+              - - Ref: AWS::AccountId
+                - dkr.ecr
+                - Ref: AWS::Region
+                - amazonaws.com/${self:custom.cryptofeed_docker_image}:latest
           Name: ${self:custom.cryptofeed_container_name}
           Memory: 128
           LogConfiguration:

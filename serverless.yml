@@ -36,10 +36,11 @@ provider:
 
 custom:
   cryptofeed_container_name: cryptofeed
+  cryptofeed_docker_image: crypto-feed-poller
 
 functions:
   crypto-feed-scheduler:
-    handler: functions/crypto-feed-scheduler.handler
+    handler: lambda-functions/crypto-feed-scheduler.handler
     vpc:
       subnetIds:
         - { Ref: CryptoFeedsPrivateSubnet }
