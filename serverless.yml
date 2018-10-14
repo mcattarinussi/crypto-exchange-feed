@@ -16,7 +16,7 @@ provider:
     - Effect: Allow
       Action:
         - ecs:ListTasks
-        - ecs:DescribeTask
+        - ecs:DescribeTasks
       Condition:
           ArnEquals: { 'ecs:cluster': { Fn::GetAtt: CryptoFeedsECSCluster.Arn } }
       Resource: '*'
@@ -25,6 +25,11 @@ provider:
       Condition:
           ArnEquals: { 'ecs:cluster': { Fn::GetAtt: CryptoFeedsECSCluster.Arn } }
       Resource: { Ref: CryptoFeedsECSCTaskDefinition }
+    - Effect: Allow
+      Action: ecs:StopTask
+      Condition:
+          ArnEquals: { 'ecs:cluster': { Fn::GetAtt: CryptoFeedsECSCluster.Arn } }
+      Resource: '*'
     - Effect: Allow
       Action: iam:PassRole
       Resource: { Fn::GetAtt: CryptoFeedsECSCTaskExecutionRole.Arn }
