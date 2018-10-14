@@ -3,12 +3,12 @@ Resources:
     Type: AWS::ECS::Cluster
     Properties:
       ClusterName: ${self:service.name}-${self:provider.stage}-cryptofeeds
-  CryptoFeedECSCTaskDefinition:
+  CryptoFeedsECSCTaskDefinition:
     Type: AWS::ECS::TaskDefinition
     Properties:
       RequiresCompatibilities:
         - FARGATE
-      ExecutionRoleArn: { Fn::GetAtt: CryptoFeedECSCTaskExecutionRole.Arn }
+      ExecutionRoleArn: { Fn::GetAtt: CryptoFeedsECSCTaskExecutionRole.Arn }
       Cpu: 256
       Memory: 0.5GB
       NetworkMode: awsvpc
@@ -21,7 +21,18 @@ Resources:
           Image: alpine:3.7
           Name: crypto-feed
           Memory: 128
-  CryptoFeedECSCTaskExecutionRole:
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: { Ref: CryptoFeedsLogGroup }
+              awslogs-region: eu-west-1
+              awslogs-stream-prefix: cryptofeed
+  CryptoFeedsLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: ${self:service.name}-${self:provider.stage}-cryptofeeds
+      RetentionInDays: 1
+  CryptoFeedsECSCTaskExecutionRole:
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
