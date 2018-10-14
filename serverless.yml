@@ -13,6 +13,19 @@ provider:
         - dynamodb:DescribeStream
         - dynamodb:ListStreams
       Resource: { Fn::GetAtt: [ CryptocurrencyDynamoTable, Arn ] }
+    - Effect: Allow
+      Action:
+        - ecs:ListTasks
+        - ecs:DescribeTask
+      Condition:
+          ArnEquals: { 'ecs:cluster': { Fn::GetAtt: CryptoFeedsECSCluster.Arn } }
+      Resource: '*'
+    - Effect: Allow
+      Action:
+        - ecs:RunTask
+      Condition:
+          ArnEquals: { 'ecs:cluster': { Fn::GetAtt: CryptoFeedsECSCluster.Arn } }
+      Resource: { Ref: CryptoFeedsECSCTaskDefinition }
 
 functions:
   crypto-feed-scheduler:
@@ -24,6 +37,8 @@ functions:
       - stream:
           type: dynamodb
           arn: { Fn::GetAtt: [ CryptocurrencyDynamoTable, StreamArn ] }
+    environment:
+      CRYPTOFEEDS_ECS_CLUSTER: { Ref: CryptoFeedsECSCluster }
 
 resources:
    - ${file(cloudformation-resources/dynamodb-table.yml)}

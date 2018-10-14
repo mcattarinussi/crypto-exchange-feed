@@ -1,3 +1,7 @@
+const AWS = require('aws-sdk');
+
+const ECS = new AWS.ECS();
+
 module.exports.handler = async (event, context) => {
   console.log(`Received ${event.Records.length} records`);
   for(record of event.Records) {
@@ -15,4 +19,6 @@ module.exports.handler = async (event, context) => {
         console.log(`Unknown event type ${record.eventName}`);
     }
   }
+  const { taskArns } = await ECS.listTasks({ cluster: process.env.CRYPTOFEEDS_ECS_CLUSTER }).promise();
+  console.log('Active ecs tasks: ', taskArns);
 }

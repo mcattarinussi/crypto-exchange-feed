@@ -1,0 +1,14 @@
+{
+  "name": "crypto-exchange-feed",
+  "version": "1.0.0",
+  "description": "Cryptocurrency Exchange Data Feed",
+  "main": "null",
+  "devDependencies": {
+    "aws-sdk": "^2.334.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Mattia Cattarinussi",
+  "license": "ISC"
+}
