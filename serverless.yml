@@ -21,11 +21,16 @@ provider:
           ArnEquals: { 'ecs:cluster': { Fn::GetAtt: CryptoFeedsECSCluster.Arn } }
       Resource: '*'
     - Effect: Allow
-      Action:
-        - ecs:RunTask
+      Action: ecs:RunTask
       Condition:
           ArnEquals: { 'ecs:cluster': { Fn::GetAtt: CryptoFeedsECSCluster.Arn } }
       Resource: { Ref: CryptoFeedsECSCTaskDefinition }
+    - Effect: Allow
+      Action: iam:PassRole
+      Resource: { Fn::GetAtt: CryptoFeedsECSCTaskExecutionRole.Arn }
+
+custom:
+  cryptofeed_container_name: cryptofeed
 
 functions:
   crypto-feed-scheduler:
@@ -38,7 +43,11 @@ functions:
           type: dynamodb
           arn: { Fn::GetAtt: [ CryptocurrencyDynamoTable, StreamArn ] }
     environment:
+      CRYPTOFEED_CONTAINER_NAME: ${self:custom.cryptofeed_container_name}
       CRYPTOFEEDS_ECS_CLUSTER: { Ref: CryptoFeedsECSCluster }
+      CRYPTOFEED_ECS_TASK_DEFINITION: { Ref: CryptoFeedsECSCTaskDefinition }
+      CRYPTOFEED_TASK_SUBNETS: { Ref: CryptoFeedsPrivateSubnet }
+      CRYPTOFEED_TASK_SEC_GROUPS: { Ref: CrpytoFeedsSG }
 
 resources:
    - ${file(cloudformation-resources/dynamodb-table.yml)}

@@ -17,9 +17,9 @@ Resources:
           Command:
             - sh
             - -c
-            - 'while true; do echo "hey! I am the crypto-feed container"; sleep 5s; done'
+            - 'while true; do echo "hey! I am the crypto-feed container for $CRYPTO_CURRENCY_SYMBOL"; sleep 5s; done'
           Image: alpine:3.7
-          Name: crypto-feed
+          Name: ${self:custom.cryptofeed_container_name}
           Memory: 128
           LogConfiguration:
             LogDriver: awslogs
