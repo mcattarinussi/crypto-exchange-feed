@@ -40,7 +40,7 @@ custom:
 
 functions:
   crypto-feed-scheduler:
-    handler: lambda-functions/crypto-feed-scheduler.handler
+    handler: crypto-feed-scheduler/index.handler
     vpc:
       subnetIds:
         - { Ref: CryptoFeedsPrivateSubnet }

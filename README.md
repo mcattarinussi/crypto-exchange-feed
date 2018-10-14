@@ -8,6 +8,8 @@ This is a demo project to experiment with dynamic task scheduling on AWS ECS. Te
 * [serverless](https://serverless.com/)
 * ...
 
+Uses [Alpha Vantage apis](https://www.alphavantage.co/documentation/#digital-currency) to fetch live crypto currencies exchange rates.
+
 ## System overview 
 
 *system diagram here..*
