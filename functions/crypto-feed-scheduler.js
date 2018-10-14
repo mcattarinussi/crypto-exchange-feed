@@ -35,6 +35,8 @@ const getRunTaskParams = cryptoCurrencySymbol => ({
   cluster: process.env.CRYPTOFEEDS_ECS_CLUSTER,
   count: 1,
   launchType: 'FARGATE',
+  group: `crypto-feed-${cryptoCurrencySymbol}`,
+  startedBy: 'crypto-feed-scheduler',
   networkConfiguration: {
     awsvpcConfiguration: {
       subnets: process.env.CRYPTOFEED_TASK_SUBNETS.split(','),
