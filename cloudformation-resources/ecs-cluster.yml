@@ -13,7 +13,7 @@ Resources:
       Memory: 0.5GB
       NetworkMode: awsvpc
       ContainerDefinitions:
-        - 
+        -
           Command:
             - sh
             - -c

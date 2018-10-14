@@ -17,6 +17,9 @@ provider:
 functions:
   crypto-feed-scheduler:
     handler: functions/crypto-feed-scheduler.handler
+    vpc:
+      subnetIds:
+        - { Ref: CryptoFeedsPrivateSubnet }
     events:
       - stream:
           type: dynamodb
