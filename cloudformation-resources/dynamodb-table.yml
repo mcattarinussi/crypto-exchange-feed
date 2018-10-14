@@ -1,0 +1,16 @@
+Resources:
+  CryptocurrencyDynamoTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: ${self:service.name}-${self:provider.stage}-cryptocurrency
+      AttributeDefinitions:
+        - AttributeName: Symbol
+          AttributeType: S
+      KeySchema:
+        - AttributeName: Symbol
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+      StreamSpecification:
+        StreamViewType: NEW_AND_OLD_IMAGES

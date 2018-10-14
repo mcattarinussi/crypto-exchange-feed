@@ -1,0 +1,90 @@
+Resources:
+  # VPC in which containers will be networked. It has one private subnet.
+  CryptoFeedsVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      InstanceTenancy: default
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+  # Setup networking resources for the public subnets. Containers
+  # in the public subnets have public IP addresses and the routing table
+  # sends network traffic via the internet gateway.
+  CryptoFeedsPublicSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: { Ref: CryptoFeedsVPC }
+      CidrBlock: 10.0.0.0/24
+      AvailabilityZone: eu-west-1a
+  CryptoFeedsInternetGateway:
+    Type: AWS::EC2::InternetGateway
+  CryptoFeedsGatewayAttachement:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: { Ref: CryptoFeedsVPC }
+      InternetGatewayId: { Ref: CryptoFeedsInternetGateway }
+  CryptoFeedsPublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: { Ref: CryptoFeedsVPC }
+  CryptoFeedsPublicRoute:
+    Type: AWS::EC2::Route
+    DependsOn: CryptoFeedsGatewayAttachement
+    Properties:
+      RouteTableId: { Ref: CryptoFeedsPublicRouteTable }
+      DestinationCidrBlock: '0.0.0.0/0'
+      GatewayId: { Ref: CryptoFeedsInternetGateway }
+  CryptoFeedsPublicSubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: { Ref: CryptoFeedsPublicSubnet }
+      RouteTableId: { Ref: CryptoFeedsPublicRouteTable }
+  # Setup networking resources for the private subnet. Containers
+  # in these subnet have only private IP addresses, and must use a NAT
+  # gateway to talk to the internet.
+  CryptoFeedsPrivateSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: { Ref: CryptoFeedsVPC }
+      CidrBlock: 10.0.1.0/24
+      AvailabilityZone: eu-west-1a
+  CryptoFeedsNatGatewayAttachment:
+    Type: AWS::EC2::EIP
+    DependsOn: CryptoFeedsGatewayAttachement
+    Properties:
+      Domain: vpc
+  CryptoFeedsNatGateway:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: { Fn::GetAtt: CryptoFeedsNatGatewayAttachment.AllocationId }
+      SubnetId: { Ref: CryptoFeedsPublicSubnet }
+  CryptoFeedsPrivateRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: { Ref: CryptoFeedsVPC }
+  CryptoFeedsRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: { Ref: CryptoFeedsPrivateRouteTable }
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: { Ref: CryptoFeedsNatGateway }
+  CryptoFeedsPrivateRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: { Ref: CryptoFeedsPrivateSubnet }
+      RouteTableId: { Ref: CryptoFeedsPrivateRouteTable }
+  # A security group for the containers we will run in Fargate.
+  CrpytoFeedsSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties: 
+      GroupDescription: 'Allows outbound connection on port 80 and 443'
+      VpcId: { Ref: CryptoFeedsVPC }
+      SecurityGroupEgress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0

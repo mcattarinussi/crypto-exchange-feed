@@ -1,0 +1,35 @@
+Resources:
+  CryptoFeedsECSCluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: ${self:service.name}-${self:provider.stage}-cryptofeeds
+  CryptoFeedECSCTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      RequiresCompatibilities:
+        - FARGATE
+      ExecutionRoleArn: { Fn::GetAtt: CryptoFeedECSCTaskExecutionRole.Arn }
+      Cpu: 256
+      Memory: 0.5GB
+      NetworkMode: awsvpc
+      ContainerDefinitions:
+        - 
+          Command:
+            - sh
+            - -c
+            - 'while true; do echo "hey! I am the crypto-feed container"; sleep 5s; done'
+          Image: alpine:3.7
+          Name: crypto-feed
+          Memory: 128
+  CryptoFeedECSCTaskExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: [ ecs-tasks.amazonaws.com ]
+          Action: [ 'sts:AssumeRole' ]
+      Path: /
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
