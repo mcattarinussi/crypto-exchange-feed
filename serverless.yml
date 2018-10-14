@@ -37,6 +37,7 @@ provider:
 custom:
   cryptofeed_container_name: cryptofeed
   cryptofeed_docker_image: crypto-feed-poller
+  alpha_vantage_api_key: ${ssm:/${self:service.name}/${self:provider.stage}/alpha_vantage_api_key}
 
 functions:
   crypto-feed-scheduler:

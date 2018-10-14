@@ -27,6 +27,9 @@ Resources:
                 - amazonaws.com/${self:custom.cryptofeed_docker_image}:latest
           Name: ${self:custom.cryptofeed_container_name}
           Memory: 128
+          Environment:
+            - Name: ALPHA_VANTAGE_API_KEY
+              Value: ${self:custom.alpha_vantage_api_key}
           LogConfiguration:
             LogDriver: awslogs
             Options:
